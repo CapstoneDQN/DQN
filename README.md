@@ -40,7 +40,7 @@ PR을 이용한 기본적인 작업 흐름은 다음과 같습니다:
 
 ```bash
 # 저장소 복제하기
-git clone https://github.com/사용자이름/저장소이름.git
+git clone https://github.com/CapstoneDQN/DQN.git
 
 # 복제한 폴더로 이동
 cd 저장소이름
