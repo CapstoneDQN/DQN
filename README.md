@@ -40,7 +40,7 @@ PR을 이용한 기본적인 작업 흐름은 다음과 같습니다:
 
 ```bash
 # 저장소 복제하기
-git clone https://github.com/CapstoneDQN/DQN.git
+git clone 저장소주소
 
 # 복제한 폴더로 이동
 cd 저장소이름
@@ -234,11 +234,80 @@ git checkout main
 git reset --hard origin/main
 ```
 
+## VSCode에서 GitHub Pull Requests 확장 사용하기
+
+Visual Studio Code의 GitHub Pull Requests 확장 프로그램을 사용하면 코드 편집기 내에서 직접 PR을 관리할 수 있어 작업 효율이 크게 향상됩니다.
+
+### 1. 확장 프로그램 설치
+
+1. VSCode 왼쪽 사이드바에서 확장(Extensions) 아이콘을 클릭합니다.
+2. 검색창에 "GitHub Pull Requests"를 입력합니다.
+3. Microsoft에서 제공하는 "GitHub Pull Requests and Issues" 확장을 찾아 설치합니다.
+4. 설치 후 VSCode를 다시 시작합니다.
+
+### 2. GitHub 계정 연결
+
+1. 확장 설치 후, VSCode 좌측 하단의 상태 표시줄에서 계정 아이콘을 클릭합니다.
+2. "Sign in to GitHub" 옵션을 선택합니다.
+3. 브라우저가 열리면 GitHub 계정으로 로그인하고 권한을 승인합니다.
+
+### 3. 확장 프로그램 사용하기
+
+#### PR 생성하기
+
+1. 코드 변경 및 커밋을 완료합니다.
+2. 왼쪽 사이드바에서 GitHub 아이콘을 클릭합니다 (GitHub 로고처럼 생긴 아이콘).
+3. "PULL REQUESTS" 섹션에서 "+"(Create Pull Request) 버튼을 클릭합니다.
+4. 원본 브랜치(보통 main이나 master)와 현재 작업 브랜치를 선택합니다.
+5. PR 제목과 설명을 입력합니다.
+6. "Create" 버튼을 클릭합니다.
+
+#### PR 검토하기
+
+1. GitHub 아이콘을 클릭합니다.
+2. "PULL REQUESTS" 섹션에서 검토할 PR을 선택합니다.
+3. PR 상세 정보가 표시됩니다:
+   - "Description" 탭: PR 설명과 상태 확인
+   - "Changes" 탭: 코드 변경사항 검토
+   - "Comments" 탭: 코멘트 확인 및 응답
+
+4. 코드 리뷰:
+   - "Changes" 탭에서 변경된 파일을 클릭하면 변경사항을 볼 수 있습니다.
+   - 특정 코드 라인에 커서를 두고 "+"(코멘트 추가) 아이콘을 클릭하여 코멘트를 남길 수 있습니다.
+   - 전체 PR에 대한 의견은 "Add Comment" 버튼을 클릭하여 작성합니다.
+   - "Approve" 또는 "Request Changes" 버튼을 클릭하여 리뷰를 완료합니다.
+
+#### PR에 대한 코멘트 응답
+
+1. 코멘트가 있는 PR을 열고 "Comments" 탭으로 이동합니다.
+2. 코멘트 아래의 "Reply" 링크를 클릭하여 응답합니다.
+3. 변경 요청에 따라 코드를 수정한 후 동일한 브랜치에 커밋하고 푸시합니다.
+   - VSCode 내에서 직접 변경 및 커밋이 가능합니다.
+
+#### PR 병합하기
+
+1. 모든 리뷰가 승인되면 PR 상세 페이지에서 "Complete Pull Request" 버튼이 활성화됩니다.
+2. 버튼을 클릭하고 병합 방법(Merge, Squash, Rebase)을 선택합니다.
+3. 필요한 경우 커밋 메시지를 수정합니다.
+4. "Complete Merge" 버튼을 클릭합니다.
+
+### 4. 유용한 기능
+
+- **체크아웃 기능**: PR 페이지에서 "Checkout" 버튼을 클릭하면 해당 PR의 브랜치를 로컬에 체크아웃할 수 있습니다.
+- **설정 동기화**: 저장소별 설정, 라벨, 템플릿 등이 VSCode 내에서 동기화됩니다.
+- **이슈 연결**: PR에 관련 이슈를 연결하여 자동으로 이슈를 종료할 수 있습니다.
+- **CI/CD 상태 확인**: PR 페이지에서 CI/CD 빌드 상태를 확인할 수 있습니다.
+
+### 5. 단축키
+
+- `Alt+P` 또는 `Option+P`: PR 검색
+- `Alt+R` 또는 `Option+R`: PR 새로고침
+- `Alt+C` 또는 `Option+C`: 현재 파일에 코멘트 추가
+
 ## 추가 팁
 
 - **작은 단위로 PR 생성하기**: 큰 변경사항은 여러 개의 작은 PR로 나누는 것이 리뷰하기 쉽습니다.
 - **PR 설명 잘 작성하기**: 변경사항이 무엇인지, 왜 필요한지 명확하게 설명하면 리뷰가 빠르게 진행됩니다.
 - **정기적으로 커밋하기**: 작은 변경사항마다 커밋하면 작업 내용을 추적하기 쉽습니다.
-- **VSCode에서 GitHub 확장 프로그램 사용하기**: VSCode의 GitHub Pull Requests 확장을 설치하면 에디터 내에서 직접 PR을 관리할 수 있습니다.
 
 언제든지 질문이나 도움이 필요하면 팀원에게 문의하세요! 모두가 처음에는 초보자였습니다. 😊
