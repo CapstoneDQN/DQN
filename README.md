@@ -242,3 +242,24 @@ git reset --hard origin/main
 - **정기적으로 커밋하기**: 작은 변경사항마다 커밋하면 작업 내용을 추적하기 쉽습니다.
 
 언제든지 질문이나 도움이 필요하면 팀원에게 문의하세요! 모두가 처음에는 초보자였습니다. 😊
+
+
+## 브랜치 병합 후 작업 흐름
+
+### 1. Pull Request 병합 후 로컬 저장소 업데이트
+
+브랜치가 메인에 병합된 후 다음 단계를 따라주세요:
+
+```bash
+# 1. 메인 브랜치로 전환
+git checkout main
+
+# 2. 최신 변경사항 가져오기
+git pull origin main
+
+# 3. 삭제된 원격 브랜치 정리
+git fetch --prune
+# 또는 축약형: git fetch -p
+
+# 4. 로컬 브랜치 정리 (선택사항)
+git branch -d feature/branch-name
