@@ -78,4 +78,3 @@ ts.restart(self._history)로 반환
 그 외엔 ts.transition()'''
 
 
-다시 이 코드의 설명을 자세히 해줘.
