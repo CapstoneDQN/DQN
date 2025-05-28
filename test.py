@@ -1,76 +1,81 @@
-import tensorflow as tf
-import time
+import numpy as np
+from tf_agents.environments import py_environment
+from tf_agents.specs import array_spec
+from tf_agents.trajectories import time_step as ts
 
-print("=== TensorFlow GPU 테스트 ===")
-print(f"TensorFlow 버전: {tf.__version__}")
+class SongHistoryEnv(py_environment.PyEnvironment):
+    def __init__(self, song_catalog, max_steps=5):
+        self._action_spec = array_spec.BoundedArraySpec(
+            shape=(), dtype=np.int32,
+            minimum=0, maximum=len(song_catalog) - 1,
 
-# 1. 사용 가능한 GPU 디바이스 확인
-print("\n1. GPU 디바이스 목록:")
-gpus = tf.config.list_physical_devices('GPU')
-if gpus:
-    for gpu in gpus:
-        print(f"   - {gpu}")
-    print(f"   총 {len(gpus)}개의 GPU 발견")
-else:
-    print("   GPU를 찾을 수 없습니다")
 
-# 2. 논리적 디바이스 확인
-print("\n2. 논리적 디바이스 목록:")
-devices = tf.config.list_logical_devices()
-for device in devices:
-    print(f"   - {device}")
+            name='action')
+        self._observation_spec = array_spec.BoundedArraySpec(
+            shape=(max_steps,), dtype=np.int32,
+            minimum=0, maximum=1,
+            name='observation')
+        self._song_catalog = song_catalog
+        self._max_steps = max_steps
+        self._history = np.zeros((max_steps,), dtype=np.int32)
+        self._step_count = 0
+        self._episode_ended = False
 
-# 3. TensorFlow가 CUDA를 사용할 수 있는지 확인
-print(f"\n3. CUDA 지원 여부: {tf.test.is_built_with_cuda()}")
-print(f"4. GPU 사용 가능 여부: {tf.test.is_gpu_available()}")
+    def action_spec(self):
+        return self._action_spec
 
-# 5. 간단한 연산 테스트 (CPU vs GPU)
-print("\n5. 연산 성능 테스트:")
+    def observation_spec(self):
+        return self._observation_spec
 
-# 큰 행렬 생성
-matrix_size = 5000
-a = tf.random.normal([matrix_size, matrix_size])
-b = tf.random.normal([matrix_size, matrix_size])
+    def _reset(self):
+        # [1, 0, 0, 0, 0] 형태로 초기화
+        self._history.fill(0)
+        self._history[0] = 1
+        self._step_count = 0
+        self._episode_ended = False
+        return ts.restart(self._history)
 
-# CPU에서 연산
-print("   CPU 연산 중...")
-with tf.device('/CPU:0'):
-    start_time = time.time()
-    c_cpu = tf.matmul(a, b)
-    cpu_time = time.time() - start_time
-    print(f"   CPU 시간: {cpu_time:.4f}초")
+    def _step(self, action):
+        if self._episode_ended:
+            return self.reset()
 
-# GPU에서 연산 (사용 가능한 경우)
-if gpus:
-    print("   GPU 연산 중...")
-    with tf.device('/GPU:0'):
-        start_time = time.time()
-        c_gpu = tf.matmul(a, b)
-        gpu_time = time.time() - start_time
-        print(f"   GPU 시간: {gpu_time:.4f}초")
-        
-        if cpu_time > gpu_time:
-            print(f"   GPU가 {cpu_time/gpu_time:.2f}배 더 빠릅니다!")
-        else:
-            print("   CPU와 GPU 성능 차이가 크지 않거나 GPU가 더 느립니다.")
-else:
-    print("   GPU를 사용할 수 없습니다.")
+        if not (0 <= action < len(self._song_catalog)):
+            raise ValueError(f'Action {action} out of bounds.')
 
-# 6. GPU 메모리 사용량 확인
-if gpus:
-    print("\n6. GPU 메모리 정보:")
-    try:
-        for i, gpu in enumerate(gpus):
-            memory_info = tf.config.experimental.get_memory_info(f'GPU:{i}')
-            print(f"   GPU {i} 현재 메모리 사용량: {memory_info['current'] / (1024**3):.2f} GB")
-            print(f"   GPU {i} 최대 메모리 사용량: {memory_info['peak'] / (1024**3):.2f} GB")
-    except:
-        print("   GPU 메모리 정보를 가져올 수 없습니다.")
+        # 1) 한 칸 시프트
+        prev = self._history.copy()
+        self._history[:-1] = prev[1:]
+        # 2) 마지막 슬롯: 이전 윈도우에 action이 있으면 1, 없으면 0
+        self._history[-1] = 1 if action in prev else 0
 
-print("\n=== 테스트 완료 ===")
+        # 스텝 증가 및 종료 판단
+        self._step_count += 1
+        if self._step_count >= self._max_steps:
+            self._episode_ended = True
+            # 종료 시 보상 = 총 스텝 수, Last 단계계
+            return ts.termination(self._history, float(self._step_count))
 
-# PR용 테스트 주석22
-print("=== PR용 테스트 주석22 ===")
-print("=== PR용 테스트 주석22 ===")
-print("=== PR용 테스트 주석22 ===")
-print("=== PR용 테스트 주석22 ===")
+        # 중간 단계 : 보상 0, 할인 1.0
+        return ts.transition(self._history, reward=0.0, discount=1.0)
+
+'''
+1. _reset()
+
+모든 슬롯을 0으로 채우고
+
+self._history[0] = 1 (첫 번째만 1)
+
+ts.restart(self._history)로 반환
+
+2. _step(action)
+
+이전 윈도우를 복사해 한 칸씩 이동
+
+마지막에 action in prev 여부로 1/0 채움
+
+스텝 수가 max_steps에 도달하면 ts.termination()
+
+그 외엔 ts.transition()'''
+
+
+다시 이 코드의 설명을 자세히 해줘.
