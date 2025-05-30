@@ -115,8 +115,12 @@ class SongHistoryEnv(py_environment.PyEnvironment):
 
         prev = self._history.copy()
         self._history[:-1] = prev[1:]
-        self._history[-1] = item2idx.get(self.user_sequence[self._step_count + 1], 0) + 1
-
+        if self._step_count + 1 < len(self.user_sequence):
+            next_song = self.user_sequence[self._step_count + 1]
+            self._history[-1] = item2idx.get(next_song, 0) + 1
+        else:
+            self._history[-1] = 0  # 또는 padding 값
+        
         self._step_count += 1
         if self._step_count >= self._max_steps - 1:
             self._episode_ended = True
