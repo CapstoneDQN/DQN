@@ -126,7 +126,17 @@ class SongHistoryEnv(py_environment.PyEnvironment):
 
     def get_mf_recommendations(self, n=5):
         current_user_id = self.user_groups.iloc[self.current_user_idx]['user_id']
-        return self._song_catalog.get_recommendations(current_user_id, n)
+        # 현재 스텝까지의 청취 이력만 사용
+        current_history = set(self.user_sequence[:self._step_count + 1])
+        
+        scores = []
+        for song_id in self._song_catalog.top_items:
+            if song_id not in current_history:  # 현재까지 들은 곡만 제외
+                pred = self._song_catalog.model.predict(current_user_id, song_id).est
+                scores.append((song_id, pred))
+        
+        scores.sort(key=lambda x: x[1], reverse=True)
+        return [s for s, _ in scores[:n]]
 
 # -------------------- 실행 --------------------
 if __name__ == "__main__":
