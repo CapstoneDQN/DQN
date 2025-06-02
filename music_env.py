@@ -38,9 +38,20 @@ class SongCatalog:
         interactions = []
         for _, row in self.user_groups.iterrows():
             user_id = row['user_id']
+            listened_songs = set(row['listening_history'])
+            
+            # 들은 곡들: rating = 1
             for song_id in row['listening_history']:
                 if song_id in self.item2idx:
                     interactions.append((user_id, song_id, 1))
+            
+            # 듣지 않은 곡들 중 일부: rating = 0
+            not_listened = set(self.top_items) - listened_songs
+            if not_listened:
+                sample_size = min(len(listened_songs), len(not_listened))
+                negative_samples = random.sample(list(not_listened), sample_size)
+                for song_id in negative_samples:
+                    interactions.append((user_id, song_id, 0))
         df_interactions = pd.DataFrame(interactions, columns=['user', 'item', 'rating'])
         reader = Reader(rating_scale=(0, 1))
         data = Dataset.load_from_df(df_interactions[['user', 'item', 'rating']], reader)
